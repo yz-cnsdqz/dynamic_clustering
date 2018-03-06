@@ -147,7 +147,7 @@ for mm = 1:length(method_set)
                 sigma = 0.0075;
 
     %             disp('--online learn the clusters and labels..');
-                [idx, C] = incrementalClustering(double(pattern), time_window,sigma,0);
+                [idx, C] = dynamic_clustering(double(pattern), time_window,sigma,0);
 
     %             disp('--postprocessing, merge clusters');
     %             idx = calLocalFeatureAggregationAndClustering(pattern,idx,C, 36); 

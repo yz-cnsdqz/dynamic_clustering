@@ -110,7 +110,7 @@ for vv = 10:10
         sigma = 25;
 
 %         disp('--online learn the clusters and labels..');
-        [idx1, C] = incrementalClustering(double(pattern), time_window,sigma,0);
+        [idx1, C] = dynamic_clustering(double(pattern), time_window,sigma,0);
 %         idx2 = zeros(size(idx1));
 %         for kk = 2:length(idx1)
 %             if idx1(kk)~=idx1(kk-1)

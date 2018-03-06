@@ -47,8 +47,8 @@ elseif strcmp(method, 'Kmeans')
 elseif strcmp(method,'ours')
     time_window = 50;
     sigma = 0.1;
-    is_temporal_reg = 0;
-    [iidx, ~] = incrementalClustering(features, time_window,sigma,is_temporal_reg,0,2.5);
+    
+    [iidx, ~] = dynamic_clustering(features, time_window,sigma,0);
 
 end
 
