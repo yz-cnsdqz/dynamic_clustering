@@ -140,7 +140,7 @@ for mm = 1:length(method_set)
                     sigma = 0.01;
 
 %                     disp('--online learn the clusters and labels..');
-                    [idx, C] = incrementalClustering(double(pattern), time_window,sigma,0,0,1.0);
+                    [idx, C] = incrementalClustering(double(pattern), time_window,sigma,0);
 
                     %%% uncomment the following for online processing
 %                     disp('--postprocessing, merge clusters');

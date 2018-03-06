@@ -126,7 +126,7 @@ for mm = 1:length(method_set)
                 is_temporal_reg = 0;
 
                 disp('--online learn the clusters and labels..');
-                [idx, C] = incrementalClustering(double(pattern), time_window,sigma,is_temporal_reg,0,2.5);
+                [idx, C] = incrementalClustering(double(pattern), time_window,sigma,0);
                 %disp('--postprocessing, merge clusters');
                 idx = calLocalFeatureAggregationAndClustering(pattern,idx,C, 36); 
 
