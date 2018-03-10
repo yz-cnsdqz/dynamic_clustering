@@ -1,4 +1,4 @@
-function idx = calLocalFeatureAggregationAndClustering(X,Xl,C,n_clusters,varargin)
+function idx = calLocalFeatureAggregationAndClusteringWithEncodedFeatures(X,Xl,n_clusters,varargin)
 
 
 % Xl(Xl~=0) = 1;
@@ -12,20 +12,19 @@ peak_width_weight = 1; %% for CMUMAD
 % pks_width = 2*pks_width;
 pks_width = round(pks_width);
 %%% use the time window to aggregate features
-features = zeros(length(pks_label), size(C,1));
+features = zeros(length(pks_label), size(X,2));
 for pp = 1:length(pks_label)
     lb = max(1,locs_label(pp)-round(peak_width_weight*pks_width(pp)));
     ub = min(size(X,1), locs_label(pp)+round(peak_width_weight*pks_width(pp)));
-    XX = X(lb : ub, :);
-    dist = pdist2(XX, C);
-    ff = exp(-0.1*dist)./ repmat(sum(exp(-0.1*dist),2), 1, size(C,1));
+    
+    ff = X(lb : ub, :);
     features(pp,:) = sum(ff,1);
     features(pp,:) = features(pp,:)/norm(features(pp,:));
 end
 
 
 method = 'Kmeans';
-if nargin == 4
+if nargin == 3
     method = 'Kmeans';
     nc = n_clusters-1;
     agg_type = 'null_action';
