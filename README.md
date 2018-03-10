@@ -69,8 +69,11 @@ Our dynamic clustering algorithm can play multiple roles to segment human action
 |ours| 0.56/__0.9__/__7.0__| 0.44/0.6/0.1| __0.82/0.86/0.1__| __0.63__/0.64/__0.1__| __0.63__/0.52/__0.1__|
 
 (2) TUMKitchen
+
 details refer to manuscript
-(3) 
+
+(3) MPII_HDM05_sports
+
 details refer to manuscript
 
 
