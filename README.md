@@ -69,7 +69,7 @@ Our dynamic clustering algorithm can play multiple roles to segment human action
 |ours| 0.56/__0.9__/__7.0__| 0.44/0.6/0.1| __0.82/0.86/0.1__| __0.63__/0.64/__0.1__| __0.63__/0.52/__0.1__|
 
 
-![An example of segmentation is shown here.][https://github.com/IchBinYanZhang/dynamic_clustering/blob/master/CMUMAD_example_segmentation.png]
+![An example of segmentation is shown here.](https://github.com/IchBinYanZhang/dynamic_clustering/blob/master/CMUMAD_example_segmentation.png)
 
 (2) TUMKitchen
 
