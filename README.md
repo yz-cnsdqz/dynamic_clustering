@@ -88,7 +88,9 @@ Before running this matlab script, please ensure that:
   
   (2) The datasets have been downloaded and the interfaces have been setup. 
   
-  (3) Video frame features from IDT+FV and VGG16 have been prepared.
+  (3) Video features IDT+FV VGG16 jointLocs relativeAngle and quaternions have been prepared. 
+  (link to download: )
+  
   
   (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
 
