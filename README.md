@@ -56,7 +56,7 @@ Our dynamic clustering algorithm can play multiple roles to segment human action
 * ours : dynamic clustering + temporal pooling + k-means
 
 
-(1) CMUMAD (precision/recall/runtime)
+(1) CMUMAD (precision/recall/runtime(in seconds))
 
 | Algorithm | IDT+FV | VGG16 | JointLocation | RelativeAngle | Quaternion |
 |-----------|-----------|-----------|-----------|-----------|-----------|
