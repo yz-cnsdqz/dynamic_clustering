@@ -78,7 +78,7 @@ details refer to manuscript
 
 
 
-### Software
+## Software
 Before running this matlab script, please ensure that:
 
   (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
