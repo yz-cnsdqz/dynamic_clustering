@@ -94,5 +94,3 @@ Before running this matlab script, please ensure that:
   
   (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
 
-For any other inquiry, please contact
-yan.zhang@uni-ulm.de
