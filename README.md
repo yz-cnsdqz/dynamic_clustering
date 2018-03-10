@@ -15,7 +15,7 @@ Afterwards, our dynamic clustering algorithm processes each individual sample al
 __Remarks__:
   * In contrast to many clustering algorithms, our method does not need to select k in advance. Instead, the cluster parameters and the number of clusters are derived jointly.
 
-  * Other methods such as Dirichlet process mixture models (DPMMs) are also able to derive data-adaptive model complexity as well. However, DPMM allocates samples to clusters according to a Dirichlet process prior. Our method allocates samples to clusters depending on the data distance. Considering a video of 10 frames, the first 7 frames are
+  * Other methods such as Dirichlet process mixture models (DPMMs) are able to derive data-adaptive model complexity as well. However, DPMM allocates samples to clusters according to a Dirichlet process prior. Our method allocates samples to clusters depending on the data distance. Considering a video of 10 frames, the first 7 frames are
 ’walking’ and the following 2 frames are ’standing’. Due to the temporal coherence, the last frame tends to be
 ’standing’ as well. The DPMM model has larger probability to label this frame as ’walking’, since the ’walk-
 ing’ cluster has more samples. But our algorithm will assign this frame to the ’standing’ cluster due to a lower
@@ -25,13 +25,57 @@ distance.
 
 
 ## Experiments
-Our dynamic clustering algorithm can play multiple roles to segment human actions temporally. 
+Our dynamic clustering algorithm can play multiple roles to segment human actions temporally: (1) When the input is the frame-wise (or short-snippet-wise) feaure sequence, the output can be used as a codebook and then feature aggregation can be applied; (2)when the input is the action pattern sequence, its output is directly the set of action clusters. Therefore, we perform offline and online experiments separately, corresponding to the two aspects respectively.
+
+### Datasets
+(1) CMUMAD (http://www.humansensing.cs.cmu.edu/mad/)
+
+(2) TUMKitchen (https://ias.in.tum.de/dokuwiki/software/kitchen-activity-data)
+
+(3) MPII_HDM05_Sports (http://resources.mpi-inf.mpg.de/HDM05/)
+
+### Features
+(1) Improved dense trajectories + Fisher vectors
+
+(2) the last layer of two-stream VGG16
+
+(3) joint locations
+
+(4) relative angles of joints
+
+(4) quaternions of joints
+
+
+### Comparison with state-of-the-art
+* SC - spectral clustering
+* TSC - temporal subspace clustering
+* ACA - aligned cluster analysis
+* EMS - efficient motion segmentation 
+* DPMM - Dirichlet process mixture model
+* DPMM-A - DPMM + temporal pooling + k-means
+* ours - dynamic clustering + temporal pooling + k-means
+
+
+(1) CMUMAD (precision/recall/runtime)
+
+| Algorithm | IDT+FV | VGG16 | JointLocation | RelativeAngle | Quaternion |
+|-----------|-----------|-----------|-----------|-----------|-----------|
+|SC| 0.57/0.85/203.3| 0.004/0.05/118.8 |0.02/0.13/113.0| 0.003/0.06/113.4 |0.01/0.11/125.3|
+|TSC| 0.63/0.82/132.4| 0.01/0.2/38.2 |0.1/0.3/48.5| 0.05/0.29/41.6| 0.05/0.29/38.7|
+|ACA|  __0.91__/0.83/547.7| 0.56/0.66/99.0| 0.55/0.68/221.5| 0.51/0.65/136.2| 0.55/__0.66__/168.8|
+|EMS| 0.44/0.75/78.4| __0.67__/__0.73__/35.8| 0.34/0.78/33.0| 0.47/__0.89__/17.3| 0.6/0.51/9.2|
+|DPMM| 0.4/0.73/507.8| 0.009/0.08/8.6| 0.02/0.12/17.8| 0.02/0.1/13.4| 0.02/0.11/11.6|
+|DPMM-A| n/a |0.24/0.53/8.6| 0.37/0.54/17.8| 0.27/0.5/13.4| 0.39/0.58/11.6|
+|ours| 0.56/__0.9__/__7.0__| 0.44/0.6/0.1| __0.82/0.86/0.1__| __0.63__/0.64/__0.1__| __0.63__/0.52/__0.1__|
+
+(2) TUMKitchen
+details refer to manuscript
+(3) 
+details refer to manuscript
 
 
 
-
-
-
+### Software
 Before running this matlab script, please ensure that:
 
   (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
