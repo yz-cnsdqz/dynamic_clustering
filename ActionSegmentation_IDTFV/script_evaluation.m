@@ -42,7 +42,7 @@ for mm = 1:length(method_set)
 
             pattern=eval_res{qqs}.stip_T_encoded{1}.feature; % test frame-based labels produced by SVM+DP (baseline)
             
-            pattern = prdInterpolation(pattern, 50, n_frames); % stride and time window is fixed.
+            
     %         pattern = [pattern; pattern(end,:)];
             n_clusters = 36;
             startTime = tic;
