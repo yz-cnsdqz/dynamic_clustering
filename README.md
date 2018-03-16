@@ -1,13 +1,16 @@
 # Temporal Human Action Segmentation via Dynamic Clustering
 
-## Citation
+## Paper and Citation
+The manuscript can be found [here](https://arxiv.org/abs/1803.05790).
+
 In case of using the code, the following work should be cited: 
-Inline `@article{1803.05790,
-Author = {Yan Zhang and He Sun and Siyu Tang and Heiko Neumann},
-Title = {Temporal Human Action Segmentation via Dynamic Clustering},
-Year = {2018},
-Journal = {arXiv preprint:1803.05790},
-}`
+
+       @article{1803.05790,
+       Author = {Yan Zhang and He Sun and Siyu Tang and Heiko Neumann},
+       Title = {Temporal Human Action Segmentation via Dynamic Clustering},
+       Year = {2018},
+       Journal = {arXiv preprint:1803.05790},
+       }
 
 ## Abstract
 We present an effective and fast dynamic clustering algorithm for the task of temporal human action segmentation in videos, which has comprehensive applications such as robotics, motion analysis, patient monitoring and so forth. Our proposed algorithm is unsupervised, simple, and applicable in both the online and offline settings, where some standard post-processing method is applied to refine our result. To demonstrate the effectiveness, we perform extensive experiments of processing video streams from a generic multi-dimensional time series and different kinds of features. Our algorithm achieves the state-of-the-art results for both online and offline settings.
