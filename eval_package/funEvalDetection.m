@@ -2,8 +2,7 @@
 % The MAD database example codes
 % Citation: 
 % Dong Huang, Yi Wang, Shitong Yao and F. De la Torre. Sequential Max-Margin Event Detectors, ECCV 2014
-% The script is modified by yan.zhang@uni-ulm.de, to evaluate the segment
-% boundary accuracy and center accuracy separately.
+% The script is modified by yan.zhang@uni-ulm.de, to evaluate the segmentation results
 function Result= funEvalDetection(gtlabE, tslab, thr, is_show)
 % INPUTS:
 %
@@ -50,7 +49,7 @@ for i = 1:size(seglab,1)
 end
 
 
-dct_N=1; %% it was 0 in the original work, but it is not correct
+dct_N=1; %% it was 0 in the original work, but it gave errors when the result has no segment boundaries
 changeframe=1; 
 for i=1:length(tslab)-1
     if (abs(tslab(i+1)-tslab(i))>0) % a change point
