@@ -1,5 +1,20 @@
 # Temporal Human Action Segmentation via Dynamic Clustering
 
+
+
+
+
+## Software
+Before running this matlab script, please ensure that:
+
+  (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
+  
+  (2) The datasets have been downloaded and the interfaces have been setup. 
+  
+  (3) Video features __IDT+FV__ __VGG16__ __jointLocs__ __relativeAngle__ and __quaternions__ for all the used datasets (see below) have been prepared. One can download our prepared features via [this link](https://emotion.informatik.uni-ulm.de/public/DynamicClustering/). Perhaps you need to redefine the data path in the source files.
+  
+  (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
+
 ## Paper and Citation
 The manuscript can be found [here](https://arxiv.org/abs/1803.05790).
 
@@ -11,6 +26,8 @@ In case of using the code, the following work should be cited:
        Year = {2018},
        Journal = {arXiv preprint:1803.05790},
        }
+
+
 
 ## Abstract
 We present an effective and fast dynamic clustering algorithm for the task of temporal human action segmentation in videos, which has comprehensive applications such as robotics, motion analysis, patient monitoring and so forth. Our proposed algorithm is unsupervised, simple, and applicable in both the online and offline settings, where some standard post-processing method is applied to refine our result. To demonstrate the effectiveness, we perform extensive experiments of processing video streams from a generic multi-dimensional time series and different kinds of features. Our algorithm achieves the state-of-the-art results for both online and offline settings.
@@ -92,17 +109,6 @@ details refer to manuscript
 details refer to manuscript
 
 
-
-## Software
-Before running this matlab script, please ensure that:
-
-  (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
-  
-  (2) The datasets have been downloaded and the interfaces have been setup. 
-  
-  (3) Video features IDT+FV VGG16 jointLocs relativeAngle and quaternions have been prepared. One can download our prepared features via [this link](https://emotion.informatik.uni-ulm.de/public/DynamicClustering/). Perhaps you need to redefine the data path in the source files.
-  
-  (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
 
 ## Acknowledgement
 We appreciate the kind technical supports from Viktor Kessler.
