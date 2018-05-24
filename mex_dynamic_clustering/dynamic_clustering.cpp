@@ -227,7 +227,7 @@ int calClusterNumbers(cv::Mat& samples){
         for (int j = i+1; j < _W.cols; j++){
             cv::Mat _jts1 = samples.row(i);
             cv::Mat _jts2 = samples.row(j);
-            _W.at<float> (i,j) = cv::norm(_jts1, _jts2, cv::NORM_L2);
+            _W.at<float> (i,j) = exp(-cv::norm(_jts1, _jts2, cv::NORM_L2));
         }
     } 
 
