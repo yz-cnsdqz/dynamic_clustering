@@ -5,6 +5,7 @@
 
 
 ## Software
+*** the Python implementation is comming soon ***
 Before running this matlab script, please ensure that:
 
   (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
@@ -16,9 +17,9 @@ Before running this matlab script, please ensure that:
   (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
 
 ## Paper and Citation
-The manuscript can be found [here](https://arxiv.org/abs/1803.05790).
+The manuscript can be found [here](https://arxiv.org/abs/1803.05790) and [here](http://bmvc2018.org/contents/papers/1000.pdf).
 
-In case of using the code, the following work should be cited: 
+In case of using the code, please consider to cite following papers: 
 
        @article{1803.05790,
        Author = {Yan Zhang and He Sun and Siyu Tang and Heiko Neumann},
@@ -27,7 +28,14 @@ In case of using the code, the following work should be cited:
        Journal = {arXiv preprint:1803.05790},
        }
 
-
+      @conference{hdc:bmvc:2018,
+        title = {Human Motion Parsing by Hierarchical Dynamic Clustering},
+        author = {Zhang, Yan and Tang, Siyu and Sun, He and Neumann, Heiko},
+        booktitle = {British Machine Vision Conference},
+        month = sep,
+        year = {2018},
+        month_numeric = {9}
+      }
 
 ## Abstract
 We present an effective and fast dynamic clustering algorithm for the task of temporal human action segmentation in videos, which has comprehensive applications such as robotics, motion analysis, patient monitoring and so forth. Our proposed algorithm is unsupervised, simple, and applicable in both the online and offline settings, where some standard post-processing method is applied to refine our result. To demonstrate the effectiveness, we perform extensive experiments of processing video streams from a generic multi-dimensional time series and different kinds of features. Our algorithm achieves the state-of-the-art results for both online and offline settings.
