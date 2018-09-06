@@ -5,7 +5,7 @@
 
 
 ## Software
-*** the Python implementation is comming soon ***
+
 Before running this matlab script, please ensure that:
 
   (1) Third-party libraries, such as TSC, KTC, ACA, matconvnet and vlfeat, have been installed.
@@ -14,7 +14,7 @@ Before running this matlab script, please ensure that:
   
   (3) Video features __IDT+FV__ __VGG16__ __jointLocs__ __relativeAngle__ and __quaternions__ for all the used datasets (see below) have been prepared. One can download our prepared features via [this link](https://emotion.informatik.uni-ulm.de/public/DynamicClustering/). Perhaps you need to redefine the data path in the source files.
   
-  (4) The mex code is tested with Ubuntu 16, Matlab 2017a.
+  (4) The mex code is tested with Ubuntu 16, Matlab 2017a. Full Python implementation is comming soon!
 
 ## Paper and Citation
 The manuscript can be found [here](https://arxiv.org/abs/1803.05790) and [here](http://bmvc2018.org/contents/papers/1000.pdf).
