@@ -129,9 +129,7 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                 NSamples.append(1.0)
                 M.append(x*x)
 
-                if updating_type == 'DP':
-                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-                    assign_prob_cumsum = list(accumulate(assign_prob))
+
             else:
 
 
@@ -162,6 +160,8 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 
                     
                     # assign the sample to cluster
+                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                    assign_prob_cumsum = list(accumulate(assign_prob))
                     iii = np.random.rand(1)[0]
                     _idx = bisect.bisect_left(assign_prob_cumsum, iii)
 
@@ -174,8 +174,7 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                         radius.append(0.0)
                         idx_saver +=1
                         idx.append(idx_saver)
-                        assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-                        assign_prob_cumsum = list(accumulate(assign_prob))
+
                     else:
                         min_idx = int(_idx)
                         NSamples[min_idx] += 1
@@ -187,6 +186,7 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 
 
 
+
     else:
         if verbose:
             print('[RUNNING LOG] obtain the initial cluster structure via graph spectra, using the first 1-second features')
@@ -194,11 +194,6 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
         ii = fps
         centers, radius, idx, M, NSamples = graph_spectral_init(X[:fps], graph_weights)    
         idx_saver = idx[-1]
-
-
-        if updating_type == 'DP':
-            assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-            assign_prob_cumsum = list(accumulate(assign_prob))
 
 
         for x in X[fps:]:
@@ -230,6 +225,8 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 
                 
                 # assign the sample to cluster
+                assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                assign_prob_cumsum = list(accumulate(assign_prob))
                 iii = np.random.rand(1)[0]
                 _idx = bisect.bisect_left(assign_prob_cumsum, iii)
 
@@ -242,8 +239,7 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                     radius.append(0.0)
                     idx_saver +=1
                     idx.append(idx_saver)
-                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-                    assign_prob_cumsum = list(accumulate(assign_prob))
+
                 else:
                     min_idx = int(_idx)
                     NSamples[min_idx] += 1
