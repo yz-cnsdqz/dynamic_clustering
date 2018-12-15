@@ -54,7 +54,8 @@ def graph_spectral_init(inputs, gamma=1.0):
 
 
 
-def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=None, graph_weights=1e-5, ClusterStructure=None, dist_type='sqeuclidean'):
+def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=None, graph_weights=1e-5, 
+                       ClusterStructure=None, dist_type='sqeuclidean', updating_type='EM'):
 ## Inputs:
 # x:                 input data array, with shape [n_frames, n_dimensions]
 # delta:             the hyper-parameter to control the complexity of cluster structure. delta=inf gives only one cluster and delta=0 gives n_frames cluster.
@@ -62,7 +63,9 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 # fps:               video parameter, frames-per-second. Not used if init_with_sc=False
 # graph_weights:     the edge weight of the fully-connected graph for initialization. Not used if init_with_sc=False
 # cluster_structure: If none, the algorithm runs from scratch. Or the algorithm continues to update the ClusterStructure using the data inputs, and other settings are overwritten by ClusterStructure.
-
+# dist_type:         the metric to measure distance between two samples. The default measure is the squared Euclidean distance
+# updating_type:     the scheme of assigning each new sample to a cluster: When EM, the default dynamic clustering is applied. When DP, the Chinese restaurant process is used.
+#                    Especially, when using DP, the delta is no longer used. See e.g. https://www.cs.princeton.edu/courses/archive/fall07/cos597C/scribe/20070921.pdf for details.
 
 
 ## Outputs: ClusterStructure
@@ -79,6 +82,10 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
     idx_saver = 0
     ii = 0
 
+    if updating_type == 'DP':
+        alpha_dp = 1.0
+
+    
     if ClusterStructure is None:        
         if verbose:
             print('[RUNNING LOG] initial cluster structure is empty.')
@@ -121,26 +128,49 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                 M.append(x*x)
             else:
 
-                min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
-                # if verbose:
-                #     print('-- the min_dist={:f}, min_idx={:d}'.format(min_dist, min_idx))
-                #     print('-- the thresh={:f}'.format(dr))
+                if updating_type == 'EM':
+                
+                    min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
+                    # if verbose:
+                    #     print('-- the min_dist={:f}, min_idx={:d}'.format(min_dist, min_idx))
+                    #     print('-- the thresh={:f}'.format(dr))
 
-                if min_dist > max(radius[min_idx], dr):
-                    centers.append(x)
-                    NSamples.append(1.0)
-                    M.append(x*x)
-                    radius.append(0.0)
-                    idx_saver +=1
-                    idx.append(idx_saver)
-                else:
-                    NSamples[min_idx] += 1
-                    centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
-                    M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
-                    Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
-                    radius[min_idx] = np.sum(Sigma)
-                    idx.append(min_idx)
+                    if min_dist > max(radius[min_idx], dr):
+                        centers.append(x)
+                        NSamples.append(1.0)
+                        M.append(x*x)
+                        radius.append(0.0)
+                        idx_saver +=1
+                        idx.append(idx_saver)
+                    else:
+                        NSamples[min_idx] += 1
+                        centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
+                        M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
+                        Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
+                        radius[min_idx] = np.sum(Sigma)
+                        idx.append(min_idx)
+               
+            
+                 elif updating_type == 'DP':
+                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                    _idx = np.random.choice(len(assign_prob), 1, assign_prob)
 
+
+                    if _idx > idx[-1]:
+                        centers.append(x)
+                        NSamples.append(1.0)
+                        M.append(x*x)
+                        radius.append(0.0)
+                        idx_saver +=1
+                        idx.append(idx_saver)
+                    else:
+                        min_idx = _idx
+                        NSamples[min_idx] += 1
+                        centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
+                        M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
+                        Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
+                        radius[min_idx] = np.sum(Sigma)
+                        idx.append(min_idx)                        
 
     else:
         if verbose:
@@ -151,24 +181,50 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
         idx_saver = idx[-1]
         for x in X[fps:]:
 
-            min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
+            
+            
+            if updating_type == 'EM':
+                min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
 
-            if min_dist > max(radius[min_idx], dr):
-                centers.append(x)
-                NSamples.append(1.0)
-                M.append(x*x)
-                radius.append(0.0)
-                idx_saver +=1
-                idx.append(idx_saver)
+                if min_dist > max(radius[min_idx], dr):
+                    centers.append(x)
+                    NSamples.append(1.0)
+                    M.append(x*x)
+                    radius.append(0.0)
+                    idx_saver +=1
+                    idx.append(idx_saver)
 
-            else:
-                NSamples[min_idx] += 1
-                centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
-                M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
-                Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
-                radius[min_idx] = np.sum(Sigma)
-                idx.append(min_idx)
+                else:
+                    NSamples[min_idx] += 1
+                    centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
+                    M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
+                    Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
+                    radius[min_idx] = np.sum(Sigma)
+                    idx.append(min_idx)
 
+                    
+                    
+              elif updating_type == 'DP':
+                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                    _idx = np.random.choice(len(assign_prob), 1, assign_prob)
+
+
+                    if _idx > idx[-1]:
+                        centers.append(x)
+                        NSamples.append(1.0)
+                        M.append(x*x)
+                        radius.append(0.0)
+                        idx_saver +=1
+                        idx.append(idx_saver)
+                    else:
+                        min_idx = _idx
+                        NSamples[min_idx] += 1
+                        centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
+                        M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
+                        Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
+                        radius[min_idx] = np.sum(Sigma)
+                        idx.append(min_idx)   
+                    
 
     ClusterStructureOut = {}
     ClusterStructureOut['centers'] = centers
