@@ -3,8 +3,8 @@ from scipy.spatial.distance import cdist
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
 from sklearn.cluster import KMeans
-
-
+from itertools import accumulate
+import bisect
 
 def compute_distance_to_clusters(x, centers, dist_type):
     ''' Identify closest center & compute distance to it '''
@@ -54,8 +54,8 @@ def graph_spectral_init(inputs, gamma=1.0):
 
 
 
-def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=None, graph_weights=1e-5, 
-                       ClusterStructure=None, dist_type='sqeuclidean', updating_type='EM'):
+def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=None, graph_weights=1e-5, ClusterStructure=None, dist_type='sqeuclidean',
+                       updating_type='EM'):
 ## Inputs:
 # x:                 input data array, with shape [n_frames, n_dimensions]
 # delta:             the hyper-parameter to control the complexity of cluster structure. delta=inf gives only one cluster and delta=0 gives n_frames cluster.
@@ -65,7 +65,7 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 # cluster_structure: If none, the algorithm runs from scratch. Or the algorithm continues to update the ClusterStructure using the data inputs, and other settings are overwritten by ClusterStructure.
 # dist_type:         the metric to measure distance between two samples. The default measure is the squared Euclidean distance
 # updating_type:     the scheme of assigning each new sample to a cluster: When EM, the default dynamic clustering is applied. When DP, the Chinese restaurant process is used.
-#                    Especially, when using DP, the delta is no longer used. See e.g. https://www.cs.princeton.edu/courses/archive/fall07/cos597C/scribe/20070921.pdf for details.
+#                    Especially, when using DP, alpha=delta. See https://www.cs.princeton.edu/courses/archive/fall07/cos597C/scribe/20070921.pdf for details.
 
 
 ## Outputs: ClusterStructure
@@ -83,9 +83,11 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
     ii = 0
 
     if updating_type == 'DP':
-        alpha_dp = 1.0
+        alpha_dp = delta
 
-    
+
+
+
     if ClusterStructure is None:        
         if verbose:
             print('[RUNNING LOG] initial cluster structure is empty.')
@@ -126,10 +128,15 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                 radius.append(0.0)
                 NSamples.append(1.0)
                 M.append(x*x)
+
+                if updating_type == 'DP':
+                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                    assign_prob_cumsum = list(accumulate(assign_prob))
             else:
 
-                if updating_type == 'EM':
-                
+
+                if updating_type == 'EM': # dynamic clustering with EM algorithm
+
                     min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
                     # if verbose:
                     #     print('-- the min_dist={:f}, min_idx={:d}'.format(min_dist, min_idx))
@@ -149,28 +156,36 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                         Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
                         radius[min_idx] = np.sum(Sigma)
                         idx.append(min_idx)
-               
-            
-                 elif updating_type == 'DP':
-                    assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-                    _idx = np.random.choice(len(assign_prob), 1, assign_prob)
 
 
-                    if _idx > idx[-1]:
+                elif updating_type == 'DP': # dynamic clustering with Dirichlet process prior on #clusters
+
+                    
+                    # assign the sample to cluster
+                    iii = np.random.rand(1)[0]
+                    _idx = bisect.bisect_left(assign_prob_cumsum, iii)
+
+
+
+                    if _idx >= len(NSamples):
                         centers.append(x)
                         NSamples.append(1.0)
                         M.append(x*x)
                         radius.append(0.0)
                         idx_saver +=1
                         idx.append(idx_saver)
+                        assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+                        assign_prob_cumsum = list(accumulate(assign_prob))
                     else:
-                        min_idx = _idx
+                        min_idx = int(_idx)
                         NSamples[min_idx] += 1
                         centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
                         M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
                         Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
                         radius[min_idx] = np.sum(Sigma)
                         idx.append(min_idx)                        
+
+
 
     else:
         if verbose:
@@ -179,11 +194,19 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
         ii = fps
         centers, radius, idx, M, NSamples = graph_spectral_init(X[:fps], graph_weights)    
         idx_saver = idx[-1]
+
+
+        if updating_type == 'DP':
+            assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
+            assign_prob_cumsum = list(accumulate(assign_prob))
+
+
         for x in X[fps:]:
 
-            
-            
+
+
             if updating_type == 'EM':
+
                 min_dist, min_idx = compute_distance_to_clusters(x, centers, dist_type)
 
                 if min_dist > max(radius[min_idx], dr):
@@ -202,29 +225,36 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
                     radius[min_idx] = np.sum(Sigma)
                     idx.append(min_idx)
 
-                    
-                    
-              elif updating_type == 'DP':
+
+            elif updating_type == 'DP': # dynamic clustering with Dirichlet process prior on #clusters
+
+                
+                # assign the sample to cluster
+                iii = np.random.rand(1)[0]
+                _idx = bisect.bisect_left(assign_prob_cumsum, iii)
+
+
+
+                if _idx >= len(NSamples):
+                    centers.append(x)
+                    NSamples.append(1.0)
+                    M.append(x*x)
+                    radius.append(0.0)
+                    idx_saver +=1
+                    idx.append(idx_saver)
                     assign_prob = [ x / (ii-1+alpha_dp) for x in NSamples] + [alpha_dp / (ii-1+alpha_dp)]
-                    _idx = np.random.choice(len(assign_prob), 1, assign_prob)
+                    assign_prob_cumsum = list(accumulate(assign_prob))
+                else:
+                    min_idx = int(_idx)
+                    NSamples[min_idx] += 1
+                    centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
+                    M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
+                    Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
+                    radius[min_idx] = np.sum(Sigma)
+                    idx.append(min_idx)     
 
 
-                    if _idx > idx[-1]:
-                        centers.append(x)
-                        NSamples.append(1.0)
-                        M.append(x*x)
-                        radius.append(0.0)
-                        idx_saver +=1
-                        idx.append(idx_saver)
-                    else:
-                        min_idx = _idx
-                        NSamples[min_idx] += 1
-                        centers[min_idx] = centers[min_idx]+(x-centers[min_idx])/(NSamples[min_idx])
-                        M[min_idx] = M[min_idx] + (x*x - M[min_idx])/(NSamples[min_idx])
-                        Sigma = M[min_idx] - centers[min_idx]*centers[min_idx]
-                        radius[min_idx] = np.sum(Sigma)
-                        idx.append(min_idx)   
-                    
+
 
     ClusterStructureOut = {}
     ClusterStructureOut['centers'] = centers
@@ -250,5 +280,3 @@ def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=Non
 
 
     return ClusterStructureOut
-
-
