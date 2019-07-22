@@ -4,6 +4,7 @@ from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
 from sklearn.cluster import KMeans
 
+
 def compute_distance_to_clusters(x, centers, dist_type):
     ''' Identify closest center & compute distance to it '''
     centers_array = np.concatenate(centers,axis=0)
@@ -11,6 +12,8 @@ def compute_distance_to_clusters(x, centers, dist_type):
     min_dist = np.amin(dist_array)
     min_idx = np.argmin(dist_array)
     return min_dist, min_idx
+
+
 
 
 def graph_spectral_init(inputs, gamma=1.0):
@@ -55,7 +58,7 @@ def graph_spectral_init(inputs, gamma=1.0):
 def dynamic_clustering(inputs, delta, verbose=False, init_with_sc=False, fps=None, graph_weights=1e-5, 
                        ClusterStructure=None, dist_type='sqeuclidean'):
 ## Inputs:
-# x:                 input data array, with shape [n_frames, n_dimensions]
+# inputs:                 input data array, with shape [n_frames, n_dimensions]
 # delta:             the hyper-parameter to control the complexity of cluster structure. delta=inf gives only one cluster and delta=0 gives n_frames cluster.
 # init_with_sc:      If true, using the first 1-second frames to initialize the cluster structure; else, the first feature vector is regarded as the initial cluster structure
 # fps:               video parameter, frames-per-second. Not used if init_with_sc=False
